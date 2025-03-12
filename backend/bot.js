@@ -9,7 +9,7 @@ bot.onText(/\/start/, (msg) => {
   const chatId = msg.chat.id;
 
   // Кнопка для открытия мини-приложения
-  const webAppUrl = 'https://ваш-домен.com/app'; // Замените на ваш домен
+  const webAppUrl = 'https://mister4004.github.io/tiktoktrends/'; // Замените на ваш домен
   const keyboard = {
     inline_keyboard: [
       [{ text: '🔥 Открыть тренды', web_app: { url: webAppUrl } }]
