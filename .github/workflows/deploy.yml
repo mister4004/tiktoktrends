@@ -1,0 +1,49 @@
+name: Deploy TikTok Trends
+
+on:
+  push:
+    branches:
+      - main  # Замените на нужную ветку (например, master)
+  workflow_dispatch:  # Позволяет запускать вручную из GitHub
+
+jobs:
+  deploy-backend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          npm install
+
+      - name: Build and deploy backend
+        run: |
+          cd backend
+          pm2 start server.js --name tiktok-server
+          pm2 save
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CLOUDFLARE_WORKER_URL: ${{ secrets.CLOUDFLARE_WORKER_URL }}
+          RSS_FEED_URL: ${{ secrets.RSS_FEED_URL }}
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Deploy frontend to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./frontend
+          destination_dir: app
