@@ -13,7 +13,7 @@
     <script>
         async function fetchTrends() {
             try {
-                const response = await fetch('https://mister4004.github.io/tiktoktrends/api/trends');
+                const response = await fetch('/api/trends'); // Используем относительный URL
                 if (!response.ok) throw new Error('Ошибка загрузки данных');
                 
                 const trends = await response.json();
@@ -33,8 +33,7 @@
                     container.appendChild(videoDiv);
                 });
             } catch (error) {
-                document.getElementById('videos-container').innerHTML = 
-                    '<p style="color: red;">Ошибка: Не удалось загрузить тренды. Проверьте консоль.</p>';
+                container.innerHTML = '<p style="color: red;">Ошибка: Не удалось загрузить тренды. Проверьте консоль.</p>';
                 console.error('Ошибка:', error);
             }
         }

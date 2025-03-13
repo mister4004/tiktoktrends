@@ -29,46 +29,31 @@ async function parseTrends() {
       }
     });
 
-    console.log('✅ Ответ от API получен. Статус:', response.status);
-    console.log('🔍 Структура ответа:', JSON.stringify(response.data, null, 2));
-
     // Проверка наличия данных
     if (!response.data || response.data.code !== 0 || !response.data.data?.videos) {
       throw new Error('Некорректный формат данных: поле "data.videos" отсутствует');
     }
 
-    // Извлечение данных
-    const trends = response.data.data.videos.map(item => {
-      console.log('📝 Данные для извлечения хэштегов:', JSON.stringify(item.challenges, null, 2));
-      
-      return {
-        title: item.title || 'N/A',
-        hashtags: item.challenges && item.challenges.length > 0 
-          ? item.challenges.map(ch => ch.title).filter(tag => tag) 
-          : [],
-        playUrl: item.play || 'N/A',
-        cover: item.cover || 'N/A'
-      };
-    });
-
-    console.log('📝 Извлечённые тренды:', JSON.stringify(trends, null, 2));
+    // Извлечение данных с добавлением ID
+    const trends = response.data.data.videos.map(item => ({
+      id: item.aweme_id, // Добавлен уникальный ID
+      title: item.title || 'N/A',
+      hashtags: item.challenges && item.challenges.length > 0 
+        ? item.challenges.map(ch => ch.title).filter(tag => tag) 
+        : [],
+      playUrl: item.play || 'N/A', // Проверьте, что это поле есть в ответе API
+      cover: item.cover || 'N/A'  // Проверьте, что это поле есть в ответе API
+    }));
 
     // Сохранение данных
     const trendsPath = path.join(__dirname, 'trends.json');
     fs.writeFileSync(trendsPath, JSON.stringify(trends, null, 2));
     console.log('💾 Данные успешно сохранены в:', trendsPath);
 
-    // Возвращаем данные, чтобы их можно было использовать в server.js
     return trends;
   } catch (error) {
     console.error('❌ Ошибка парсера:', error.message);
-    if (error.response) {
-      console.error('⚠️ Статус ответа API:', error.response.status);
-      console.error('⚠️ Данные ошибки:', JSON.stringify(error.response.data, null, 2));
-    } else {
-      console.error('⚠️ Ошибка сети:', error.message);
-    }
-    return null; // Возвращаем null в случае ошибки
+    return null;
   }
 }
 
