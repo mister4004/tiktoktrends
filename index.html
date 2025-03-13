@@ -7,7 +7,40 @@
 </head>
 <body>
     <h1>🔥 Тренды TikTok</h1>
-    <div id="videos"></div>
-    <script src="app.js"></script>
+    <button onclick="fetchTrends()">Обновить тренды</button>
+    <div id="videos-container"></div>
+
+    <script>
+        async function fetchTrends() {
+            try {
+                const response = await fetch('https://mister4004.github.io/tiktoktrends/api/trends');
+                if (!response.ok) throw new Error('Ошибка загрузки данных');
+                
+                const trends = await response.json();
+                const container = document.getElementById('videos-container');
+                container.innerHTML = ''; // Очистка предыдущих данных
+
+                trends.forEach(trend => {
+                    const videoDiv = document.createElement('div');
+                    videoDiv.className = 'video-item';
+                    videoDiv.innerHTML = `
+                        <h2>${trend.title}</h2>
+                        <p>Хэштеги: ${trend.hashtags.join(', ') || 'Нет хэштегов'}</p>
+                        <video controls poster="${trend.cover}">
+                            <source src="${trend.playUrl}" type="video/mp4">
+                        </video>
+                    `;
+                    container.appendChild(videoDiv);
+                });
+            } catch (error) {
+                document.getElementById('videos-container').innerHTML = 
+                    '<p style="color: red;">Ошибка: Не удалось загрузить тренды. Проверьте консоль.</p>';
+                console.error('Ошибка:', error);
+            }
+        }
+
+        // Загрузка трендов при старте
+        fetchTrends();
+    </script>
 </body>
 </html>

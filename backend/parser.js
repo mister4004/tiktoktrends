@@ -39,12 +39,10 @@ async function parseTrends() {
 
     // Извлечение данных
     const trends = response.data.data.videos.map(item => {
-      // Добавлено логирование для отладки хэштегов
       console.log('📝 Данные для извлечения хэштегов:', JSON.stringify(item.challenges, null, 2));
       
       return {
         title: item.title || 'N/A',
-        // Обновленная проверка хэштегов
         hashtags: item.challenges && item.challenges.length > 0 
           ? item.challenges.map(ch => ch.title).filter(tag => tag) 
           : [],
@@ -57,13 +55,11 @@ async function parseTrends() {
 
     // Сохранение данных
     const trendsPath = path.join(__dirname, 'trends.json');
-    console.log('📝 Данные для сохранения:', JSON.stringify(trends, null, 2));
     fs.writeFileSync(trendsPath, JSON.stringify(trends, null, 2));
     console.log('💾 Данные успешно сохранены в:', trendsPath);
 
-    // Проверка содержимого файла после записи
-    const savedData = fs.readFileSync(trendsPath, 'utf-8');
-    console.log('📁 Содержимое файла trends.json:', savedData);
+    // Возвращаем данные, чтобы их можно было использовать в server.js
+    return trends;
   } catch (error) {
     console.error('❌ Ошибка парсера:', error.message);
     if (error.response) {
@@ -72,6 +68,7 @@ async function parseTrends() {
     } else {
       console.error('⚠️ Ошибка сети:', error.message);
     }
+    return null; // Возвращаем null в случае ошибки
   }
 }
 
