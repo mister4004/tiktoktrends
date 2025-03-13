@@ -1,0 +1,3 @@
+# Игнорировать node_modules
+node_modules/
+backend/test-bot.js
